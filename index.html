@@ -1,11 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Calculator</title>
+  <title>Simple Cost Calculator</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 500px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    button {
+      background: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Cost Calculator</h1>
+<h1>Cost of Living Calculator</h1>
+
+<!-- QUESTION 1 -->
+<label>How much do you eat out per week?</label>
+<select id="eatOut">
+  <option value="30">1x - 3x ($30)</option>
+  <option value="50">4x - 6x ($50)</option>
+  <option value="90">7+ ($90)</option>
+</select>
+
+<!-- QUESTION 2 -->
+<label>How do you travel?</label>
+<select id="travel">
+  <option value="0">Bicycle ($0)</option>
+  <option value="10">Bus ($10)</option>
+  <option value="50">Car ($50)</option>
+</select>
+
+<button onclick="calculate()">Calculate Total</button>
+
+<h2 id="result"></h2>
+
+<script>
+function calculate() {
+  let eatOut = Number(document.getElementById("eatOut").value);
+  let travel = Number(document.getElementById("travel").value);
+
+  let total = eatOut + travel;
+
+  document.getElementById("result").innerText =
+    "Total weekly cost: $" + total;
+}
+</script>
 
 </body>
 </html>
