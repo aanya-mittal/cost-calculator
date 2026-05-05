@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Cost Calculator</title>
+  <title>Cost of Living Calculator</title>
   <style>
     body {
       font-family: Arial;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       padding: 20px;
     }
 
-    select, button {
+    h1 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+
+    select, input, button {
       width: 100%;
       padding: 10px;
-      margin: 10px 0;
+      margin-top: 5px;
     }
 
     button {
@@ -21,48 +30,163 @@
       color: white;
       border: none;
       cursor: pointer;
+      margin-top: 20px;
     }
 
-    h2 {
+    .result-box {
       margin-top: 20px;
+      padding: 15px;
+      background: #f4f4f4;
     }
   </style>
 </head>
+
 <body>
 
 <h1>Cost of Living Calculator</h1>
 
-<!-- QUESTION 1 -->
-<label>How much do you eat out per week?</label>
-<select id="eatOut">
-  <option value="30">1x - 3x </option>
-  <option value="50">4x - 6x </option>
-  <option value="90">7+ </option>
+<p><i>All values are estimated weekly averages based on Sydney living costs.</i></p>
+
+<!-- ACCOMMODATION -->
+<label>Accommodation</label>
+<select id="rent">
+  <option value="0">Skip</option>
+  <option value="800">Single - Family Home ($800)</option>
+  <option value="350">Granny Flat ($350)</option>
+  <option value="600">Town House ($600)</option>
+  <option value="550">Apartment ($550)</option>
 </select>
 
-<!-- QUESTION 2 -->
-<label>How do you travel?</label>
-<select id="travel">
-  <option value="0">Bicycle </option>
-  <option value="10">Bus </option>
-  <option value="50">Car  </option>
+<!-- TRANSPORT -->
+<h3>Transport</h3>
+
+<label>Bicycle</label>
+<select id="bike">
+  <option value="0">Never</option>
+  <option value="5">Sometimes ($5)</option>
+  <option value="10">Often ($10)</option>
 </select>
 
-<button onclick="calculate()">Calculate Total</button>
+<label>Public Transport</label>
+<select id="public">
+  <option value="0">Never</option>
+  <option value="20">Sometimes ($20)</option>
+  <option value="50">Often ($50)</option>
+</select>
 
-<h2 id="result"></h2>
+<label>Car</label>
+<select id="car">
+  <option value="0">Never</option>
+  <option value="80">Sometimes ($80)</option>
+  <option value="200">Often ($200)</option>
+</select>
+
+<label>Taxi / Uber</label>
+<select id="uber">
+  <option value="0">Never</option>
+  <option value="40">Sometimes ($40)</option>
+  <option value="120">Often ($120)</option>
+</select>
+
+<!-- FOOD -->
+<h3>Eating Out</h3>
+
+<label>Breakfasts per week</label>
+<input type="number" id="breakfast" min="0" max="7" value="0">
+
+<label>Lunches per week</label>
+<input type="number" id="lunch" min="0" max="7" value="0">
+
+<label>Dinners per week</label>
+<input type="number" id="dinner" min="0" max="7" value="0">
+
+<label>Price Level</label>
+<select id="foodPrice">
+  <option value="15">Cheap ($15)</option>
+  <option value="35">Moderate ($35)</option>
+  <option value="60">Expensive ($60)</option>
+</select>
+
+<!-- LIFESTYLE -->
+<h3>Lifestyle</h3>
+
+<label>Shopping</label>
+<select id="shop">
+  <option value="0">Never</option>
+  <option value="50">Sometimes ($50)</option>
+  <option value="200">Often ($200)</option>
+</select>
+
+<label>Cinema</label>
+<select id="cinema">
+  <option value="0">Never</option>
+  <option value="25">Sometimes ($25)</option>
+  <option value="60">Often ($60)</option>
+</select>
+
+<label>Fitness Classes</label>
+<select id="fitness">
+  <option value="0">Never</option>
+  <option value="25">Sometimes ($25)</option>
+  <option value="70">Often ($70)</option>
+</select>
+
+<label>Personal Care (Hair, Nails, etc.)</label>
+<select id="care">
+  <option value="0">Never</option>
+  <option value="25">Sometimes ($25)</option>
+  <option value="70">Often ($70)</option>
+</select>
+
+<button onclick="calculate()">Calculate Weekly Cost</button>
+
+<div class="result-box" id="result"></div>
 
 <script>
 function calculate() {
-  let eatOut = Number(document.getElementById("eatOut").value);
-  let travel = Number(document.getElementById("travel").value);
 
-  let total = eatOut + travel;
+  // RENT
+  let rent = Number(document.getElementById("rent").value);
 
-  document.getElementById("result").innerText =
-    "Total weekly cost: $" + total;
+  // TRANSPORT
+  let bike = Number(document.getElementById("bike").value);
+  let publicT = Number(document.getElementById("public").value);
+  let car = Number(document.getElementById("car").value);
+  let uber = Number(document.getElementById("uber").value);
+  let transportTotal = bike + publicT + car + uber;
+
+  // FOOD
+  let breakfast = Number(document.getElementById("breakfast").value) || 0;
+  let lunch = Number(document.getElementById("lunch").value) || 0;
+  let dinner = Number(document.getElementById("dinner").value) || 0;
+  let foodPrice = Number(document.getElementById("foodPrice").value);
+
+  let meals = breakfast + lunch + dinner;
+  let foodTotal = meals * foodPrice;
+
+  // LIFESTYLE
+  let shop = Number(document.getElementById("shop").value);
+  let cinema = Number(document.getElementById("cinema").value);
+  let fitness = Number(document.getElementById("fitness").value);
+  let care = Number(document.getElementById("care").value);
+
+  let lifestyleTotal = shop + cinema + fitness + care;
+
+  // TOTAL
+  let total = rent + transportTotal + foodTotal + lifestyleTotal;
+
+  // OUTPUT
+  document.getElementById("result").innerHTML = `
+    <h2>Total Weekly Cost: $${total}</h2>
+    <p><strong>Breakdown:</strong></p>
+    <p>🏠 Rent: $${rent}</p>
+    <p>🚗 Transport: $${transportTotal}</p>
+    <p>🍔 Eating Out: $${foodTotal}</p>
+    <p>🎬 Lifestyle: $${lifestyleTotal}</p>
+  `;
 }
 </script>
 
 </body>
 </html>
+
