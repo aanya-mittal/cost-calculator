@@ -69,8 +69,8 @@
 <label>Bicycle</label>
 <select id="bike">
   <option value="0">Never</option>
-  <option value="5">Sometimes ($5)</option>
-  <option value="10">Often ($10)</option>
+  <option value="5">Sometimes</option>
+  <option value="10">Often</option>
 </select>
 
 <label>Public Transport</label>
@@ -83,15 +83,15 @@
 <label>Car</label>
 <select id="car">
   <option value="0">Never</option>
-  <option value="80">Sometimes </option>
+  <option value="80">Sometimes</option>
   <option value="200">Often</option>
 </select>
 
 <label>Taxi / Uber</label>
 <select id="uber">
   <option value="0">Never</option>
-  <option value="40">Sometimes </option>
-  <option value="120">Often </option>
+  <option value="40">Sometimes</option>
+  <option value="120">Often</option>
 </select>
 
 <!-- ================= FOOD ================= -->
@@ -128,22 +128,22 @@
 <label>Cinema</label>
 <select id="cinema">
   <option value="0">Never</option>
-  <option value="25">Sometimes </option>
-  <option value="60">Often </option>
+  <option value="25">Sometimes</option>
+  <option value="60">Often</option>
 </select>
 
 <label>Fitness Classes</label>
 <select id="fitness">
   <option value="0">Never</option>
-  <option value="25">Sometimes </option>
-  <option value="70">Often </option>
+  <option value="25">Sometimes</option>
+  <option value="70">Often</option>
 </select>
 
 <label>Personal Care (Hair, Nails, etc.)</label>
 <select id="care">
   <option value="0">Never</option>
-  <option value="25">Sometimes </option>
-  <option value="70">Often </option>
+  <option value="25">Sometimes</option>
+  <option value="70">Often</option>
 </select>
 
 <button onclick="calculate()">Calculate Weekly Cost</button>
@@ -154,16 +154,11 @@
 function calculate() {
 
   // ================= RENT =================
-  // benchmark comes from dropdown value
   let rentBenchmark = document.getElementById("rentType").value;
-
-  // actual user input rent
   let rent = Number(document.getElementById("rentInput").value) || 0;
 
-  // feedback text storage
   let rentFeedback = "";
 
-  // only compare if user did not skip
   if (rentBenchmark !== "none" && rent > 0) {
     rentBenchmark = Number(rentBenchmark);
 
@@ -190,8 +185,7 @@ function calculate() {
   let dinner = Number(document.getElementById("dinner").value) || 0;
   let foodPrice = Number(document.getElementById("foodPrice").value);
 
-  let meals = breakfast + lunch + dinner;
-  let foodTotal = meals * foodPrice;
+  let foodTotal = (breakfast + lunch + dinner) * foodPrice;
 
   // ================= LIFESTYLE =================
   let shop = Number(document.getElementById("shop").value);
@@ -213,24 +207,21 @@ function calculate() {
 
   let feedback = "";
 
-  // ================= TRANSPORT CHECK =================
+  // ================= CHECKS =================
   if (transportTotal > benchmarks.transport) {
     feedback += "🚗 Your transport costs are high. Consider using public transport more often.<br>";
   }
 
-  // ================= FOOD CHECK =================
   if (foodTotal > benchmarks.food) {
     feedback += "🍔 You spend a lot on eating out. Try cooking more meals at home.<br>";
   }
 
-  // ================= LIFESTYLE CHECK =================
   if (lifestyleTotal > benchmarks.lifestyle) {
     feedback += "🎬 Lifestyle spending is high. Reducing non-essential activities could help.<br>";
   }
 
-  // ================= OVERALL CHECK =================
-  if (total > 1500) {
-    feedback += "<br><strong>⚠️ Your total spending is quite high compared to average.</strong>";
+  if (total > 1000) {
+    feedback += "<strong>⚠️ Your total spending is quite high compared to average.</strong><br>";
   }
 
   // ================= OUTPUT =================
@@ -239,7 +230,9 @@ function calculate() {
 
     <p><strong>Rent Feedback:</strong><br>${rentFeedback}</p>
 
-    <p><strong>Suggestions:</strong><br>${feedback || "✅ Your spending is within a reasonable range."}</p>
+    <p><strong>Suggestions:</strong><br>
+      ${feedback || "✅ Your spending is within a reasonable range."}
+    </p>
   `;
 }
 </script>
