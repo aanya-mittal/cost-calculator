@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Cost of Living Calculator</title>
+
   <style>
     body {
       font-family: Arial;
@@ -47,18 +48,23 @@
 
 <p><i>All values are estimated weekly averages based on Sydney living costs.</i></p>
 
-<!-- ACCOMMODATION -->
-<label>Accommodation</label>
-<select id="rent">
-  <option value="0">Skip</option>
-  <option value="800">Single - Family Home ($800)</option>
-  <option value="350">Granny Flat ($350)</option>
-  <option value="600">Town House ($600)</option>
-  <option value="550">Apartment ($550)</option>
+<!-- ================= ACCOMMODATION ================= -->
+
+<label>What type of accommodation are you renting? (optional)</label>
+<select id="rentType">
+  <option value="none">Skip</option>
+  <option value="900">Single, Family Home</option>
+  <option value="500">Granny Flat</option>
+  <option value="700">Town House</option>
+  <option value="700">Apartment</option>
 </select>
 
-<!-- TRANSPORT -->
-<h3>Transport</h3>
+<label>Enter your weekly rent ($)</label>
+<input type="number" id="rentInput" placeholder="e.g. 500">
+
+<!-- ================= TRANSPORT ================= -->
+
+<h3>What kinds of transport do you use and how often?</h3>
 
 <label>Bicycle</label>
 <select id="bike">
@@ -70,72 +76,74 @@
 <label>Public Transport</label>
 <select id="public">
   <option value="0">Never</option>
-  <option value="20">Sometimes ($20)</option>
-  <option value="50">Often ($50)</option>
+  <option value="20">Sometimes</option>
+  <option value="50">Often</option>
 </select>
 
 <label>Car</label>
 <select id="car">
   <option value="0">Never</option>
-  <option value="80">Sometimes ($80)</option>
-  <option value="200">Often ($200)</option>
+  <option value="80">Sometimes </option>
+  <option value="200">Often</option>
 </select>
 
 <label>Taxi / Uber</label>
 <select id="uber">
   <option value="0">Never</option>
-  <option value="40">Sometimes ($40)</option>
-  <option value="120">Often ($120)</option>
+  <option value="40">Sometimes </option>
+  <option value="120">Often </option>
 </select>
 
-<!-- FOOD -->
+<!-- ================= FOOD ================= -->
+
 <h3>Eating Out</h3>
 
-<label>Breakfasts per week</label>
+<label>How often do you purchase breakfast per week?</label>
 <input type="number" id="breakfast" min="0" max="7" value="0">
 
-<label>Lunches per week</label>
+<label>How often do you purchase lunch per week?</label>
 <input type="number" id="lunch" min="0" max="7" value="0">
 
-<label>Dinners per week</label>
+<label>How often do you purchase dinner per week?</label>
 <input type="number" id="dinner" min="0" max="7" value="0">
 
-<label>Price Level</label>
+<label>How much does each meal cost on average?</label>
 <select id="foodPrice">
   <option value="15">Cheap ($15)</option>
-  <option value="35">Moderate ($35)</option>
+  <option value="35">Moderate ($30)</option>
   <option value="60">Expensive ($60)</option>
 </select>
 
-<!-- LIFESTYLE -->
-<h3>Lifestyle</h3>
+<!-- ================= LIFESTYLE ================= -->
+
+<h3>How often do you undertake these lifestyle activities?</h3>
 
 <label>Shopping</label>
 <select id="shop">
   <option value="0">Never</option>
-  <option value="50">Sometimes ($50)</option>
-  <option value="200">Often ($200)</option>
+  <option value="50">Sometimes</option>
+  <option value="200">Often</option>
 </select>
 
 <label>Cinema</label>
 <select id="cinema">
   <option value="0">Never</option>
-  <option value="25">Sometimes ($25)</option>
-  <option value="60">Often ($60)</option>
+  <option value="25">Sometimes </option>
+  <option value="60">Often </option>
 </select>
 
 <label>Fitness Classes</label>
 <select id="fitness">
   <option value="0">Never</option>
-  <option value="25">Sometimes ($25)</option>
-  <option value="70">Often ($70)</option>
+  <option value="25">Sometimes </option>
+  <option value="70">Often </option>
 </select>
 
 <label>Personal Care (Hair, Nails, etc.)</label>
 <select id="care">
   <option value="0">Never</option>
-  <option value="25">Sometimes ($25)</option>
-  <option value="70">Often ($70)</option>
+  <option value="25">Sometimes </option>
+  <option value="70">Often </option>
 </select>
 
 <button onclick="calculate()">Calculate Weekly Cost</button>
@@ -145,17 +153,38 @@
 <script>
 function calculate() {
 
-  // RENT
-  let rent = Number(document.getElementById("rent").value);
+  // ================= RENT =================
+  // benchmark comes from dropdown value
+  let rentBenchmark = document.getElementById("rentType").value;
 
-  // TRANSPORT
+  // actual user input rent
+  let rent = Number(document.getElementById("rentInput").value) || 0;
+
+  // feedback text storage
+  let rentFeedback = "";
+
+  // only compare if user did not skip
+  if (rentBenchmark !== "none" && rent > 0) {
+    rentBenchmark = Number(rentBenchmark);
+
+    if (rent > rentBenchmark) {
+      rentFeedback = "🏠 Your rent is above average for this housing type.<br>";
+    } else if (rent < rentBenchmark) {
+      rentFeedback = "🏠 Your rent is below average for this housing type.<br>";
+    } else {
+      rentFeedback = "🏠 Your rent matches the average.<br>";
+    }
+  }
+
+  // ================= TRANSPORT =================
   let bike = Number(document.getElementById("bike").value);
   let publicT = Number(document.getElementById("public").value);
   let car = Number(document.getElementById("car").value);
   let uber = Number(document.getElementById("uber").value);
+
   let transportTotal = bike + publicT + car + uber;
 
-  // FOOD
+  // ================= FOOD =================
   let breakfast = Number(document.getElementById("breakfast").value) || 0;
   let lunch = Number(document.getElementById("lunch").value) || 0;
   let dinner = Number(document.getElementById("dinner").value) || 0;
@@ -164,7 +193,7 @@ function calculate() {
   let meals = breakfast + lunch + dinner;
   let foodTotal = meals * foodPrice;
 
-  // LIFESTYLE
+  // ================= LIFESTYLE =================
   let shop = Number(document.getElementById("shop").value);
   let cinema = Number(document.getElementById("cinema").value);
   let fitness = Number(document.getElementById("fitness").value);
@@ -172,21 +201,48 @@ function calculate() {
 
   let lifestyleTotal = shop + cinema + fitness + care;
 
-  // TOTAL
+  // ================= TOTAL =================
   let total = rent + transportTotal + foodTotal + lifestyleTotal;
 
-  // OUTPUT
+  // ================= BENCHMARKS =================
+  const benchmarks = {
+    transport: 100,
+    food: 150,
+    lifestyle: 120
+  };
+
+  let feedback = "";
+
+  // ================= TRANSPORT CHECK =================
+  if (transportTotal > benchmarks.transport) {
+    feedback += "🚗 Your transport costs are high. Consider using public transport more often.<br>";
+  }
+
+  // ================= FOOD CHECK =================
+  if (foodTotal > benchmarks.food) {
+    feedback += "🍔 You spend a lot on eating out. Try cooking more meals at home.<br>";
+  }
+
+  // ================= LIFESTYLE CHECK =================
+  if (lifestyleTotal > benchmarks.lifestyle) {
+    feedback += "🎬 Lifestyle spending is high. Reducing non-essential activities could help.<br>";
+  }
+
+  // ================= OVERALL CHECK =================
+  if (total > 1500) {
+    feedback += "<br><strong>⚠️ Your total spending is quite high compared to average.</strong>";
+  }
+
+  // ================= OUTPUT =================
   document.getElementById("result").innerHTML = `
     <h2>Total Weekly Cost: $${total}</h2>
-    <p><strong>Breakdown:</strong></p>
-    <p>🏠 Rent: $${rent}</p>
-    <p>🚗 Transport: $${transportTotal}</p>
-    <p>🍔 Eating Out: $${foodTotal}</p>
-    <p>🎬 Lifestyle: $${lifestyleTotal}</p>
+
+    <p><strong>Rent Feedback:</strong><br>${rentFeedback}</p>
+
+    <p><strong>Suggestions:</strong><br>${feedback || "✅ Your spending is within a reasonable range."}</p>
   `;
 }
 </script>
 
 </body>
 </html>
-
