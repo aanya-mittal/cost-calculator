@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial;
-      max-width: 600px;
+      max-width: 650px;
       margin: auto;
       padding: 20px;
     }
@@ -48,23 +48,26 @@
 
 <p><i>All values are estimated weekly averages based on Sydney living costs.</i></p>
 
-<!-- ================= ACCOMMODATION ================= -->
+<!-- ================= RENT SECTION ================= -->
 
-<label>What type of accommodation are you renting? (optional)</label>
+<!-- User selects accommodation type -->
+<label>Accommodation Type</label>
 <select id="rentType">
   <option value="none">Skip</option>
-  <option value="570-810">Single, Family Home</option>
-  <option value="480-620">Granny Flat</option>
-  <option value="600-730">Apartment</option>
+  <option value="home">Single / Family Home</option>
+  <option value="granny">Granny Flat</option>
+  <option value="apartment">Apartment</option>
 </select>
 
+<!-- User manually enters rent cost -->
 <label>Enter your weekly rent ($)</label>
 <input type="number" id="rentInput" placeholder="e.g. 500">
 
-<!-- ================= TRANSPORT ================= -->
+<!-- ================= TRANSPORT SECTION ================= -->
 
-<h3>What kinds of transport do you use and how often?</h3>
+<h3>Transport Usage</h3>
 
+<!-- Bicycle usage cost estimate -->
 <label>Bicycle</label>
 <select id="bike">
   <option value="0">Never</option>
@@ -72,13 +75,15 @@
   <option value="10">Often</option>
 </select>
 
+<!-- Public transport usage -->
 <label>Public Transport</label>
-<select id="public">
+<select id="publicTransport">
   <option value="0">Never</option>
   <option value="20">Sometimes</option>
   <option value="50">Often</option>
 </select>
 
+<!-- Car usage cost -->
 <label>Car</label>
 <select id="car">
   <option value="0">Never</option>
@@ -86,6 +91,7 @@
   <option value="200">Often</option>
 </select>
 
+<!-- Uber / taxi usage -->
 <label>Taxi / Uber</label>
 <select id="uber">
   <option value="0">Never</option>
@@ -93,29 +99,34 @@
   <option value="120">Often</option>
 </select>
 
-<!-- ================= FOOD ================= -->
+<!-- ================= FOOD SECTION ================= -->
 
-<h3>Eating Out</h3>
+<h3>Food (Meals per week)</h3>
 
-<label>How often do you purchase breakfast per week?</label>
-<input type="number" id="breakfast" min="0" max="7" value="0">
+<!-- Each meal input is limited to 0–7 days per week -->
 
-<label>How often do you purchase lunch per week?</label>
-<input type="number" id="lunch" min="0" max="7" value="0">
+<label>Breakfast</label>
+<input type="number" id="breakfast" min="0" max="7" value="0" oninput="clampMeals(this)">
 
-<label>How often do you purchase dinner per week?</label>
-<input type="number" id="dinner" min="0" max="7" value="0">
+<label>Lunch</label>
+<input type="number" id="lunch" min="0" max="7" value="0" oninput="clampMeals(this)">
 
-<label>How much does each meal cost on average?</label>
+<label>Dinner</label>
+<input type="number" id="dinner" min="0" max="7" value="0" oninput="clampMeals(this)">
+
+<!-- Meal cost category (cheap/moderate/expensive) -->
+<label>Meal Price Level</label>
 <select id="foodPrice">
   <option value="15">Cheap ($15)</option>
-  <option value="35">Moderate ($30)</option>
+  <option value="35">Moderate ($35)</option>
   <option value="60">Expensive ($60)</option>
 </select>
 
-<!-- ================= LIFESTYLE ================= -->
+<!-- ================= LIFESTYLE SECTION ================= -->
 
-<h3>How often do you undertake these lifestyle activities?</h3>
+<h3>Lifestyle Spending</h3>
+
+<!-- Optional discretionary spending categories -->
 
 <label>Shopping</label>
 <select id="shop">
@@ -145,95 +156,152 @@
   <option value="70">Often</option>
 </select>
 
+<!-- Button triggers calculation function -->
 <button onclick="calculate()">Calculate Weekly Cost</button>
 
+<!-- Output area for results -->
 <div class="result-box" id="result"></div>
 
 <script>
+
+/* ================= REFERENCE DATA ================= */
+
+/*
+  These are baseline ranges used for comparison.
+  They represent estimated weekly costs in Sydney.
+*/
+const rentRanges = {
+  home: { min: 570, max: 810 },
+  granny: { min: 480, max: 620 },
+  apartment: { min: 600, max: 730 }
+};
+
+/*
+  Benchmarks represent "healthy spending limits"
+  used for generating feedback messages.
+*/
+const benchmarks = {
+  transport: 100,
+  food: 150,
+  lifestyle: 120
+};
+
+/* ================= MEAL INPUT VALIDATION ================= */
+
+/*
+  Ensures meal inputs stay between 0 and 7
+  (since there are 7 days in a week)
+*/
+function clampMeals(el) {
+  let value = Number(el.value);
+
+  if (value > 7) el.value = 7;  // prevents unrealistic input
+  if (value < 0) el.value = 0;   // prevents negative values
+}
+
+/* ================= MAIN CALCULATION FUNCTION ================= */
+
 function calculate() {
 
-  // ================= RENT =================
-  let rentBenchmark = document.getElementById("rentType").value;
+  // ===== RENT CALCULATION =====
+  let rentType = document.getElementById("rentType").value;
+
+  // Convert rent input to number; default to 0 if empty
   let rent = Number(document.getElementById("rentInput").value) || 0;
 
   let rentFeedback = "";
 
-  if (rentBenchmark !== "none" && rent > 0) {
-    rentBenchmark = Number(rentBenchmark);
+  /*
+    If user selected a rent type and entered a value,
+    compare it to expected Sydney ranges.
+  */
+  if (rentType !== "none" && rent > 0) {
+    let range = rentRanges[rentType];
 
-    if (rent > rentBenchmark) {
-      rentFeedback = "🏠 Your rent is above average for this housing type.<br>";
-    } else if (rent < rentBenchmark) {
-      rentFeedback = "🏠 Your rent is below average for this housing type.<br>";
+    if (rent > range.max) {
+      rentFeedback = "🏠 Your rent is above the expected range.<br>";
+    } else if (rent < range.min) {
+      rentFeedback = "🏠 Your rent is below the expected range.<br>";
     } else {
-      rentFeedback = "🏠 Your rent matches the average.<br>";
+      rentFeedback = "🏠 Your rent is within the expected range.<br>";
     }
   }
 
-  // ================= TRANSPORT =================
-  let bike = Number(document.getElementById("bike").value);
-  let publicT = Number(document.getElementById("public").value);
-  let car = Number(document.getElementById("car").value);
-  let uber = Number(document.getElementById("uber").value);
+  // ===== TRANSPORT CALCULATION =====
+  /*
+    Adds all transport-related costs based on frequency selection
+  */
+  let transportTotal =
+    Number(document.getElementById("bike").value) +
+    Number(document.getElementById("publicTransport").value) +
+    Number(document.getElementById("car").value) +
+    Number(document.getElementById("uber").value);
 
-  let transportTotal = bike + publicT + car + uber;
+  // ===== FOOD CALCULATION =====
+  /*
+    Total meals per week × cost per meal
+  */
+  let foodTotal =
+    (Number(document.getElementById("breakfast").value) +
+     Number(document.getElementById("lunch").value) +
+     Number(document.getElementById("dinner").value)) *
+    Number(document.getElementById("foodPrice").value);
 
-  // ================= FOOD =================
-  let breakfast = Number(document.getElementById("breakfast").value) || 0;
-  let lunch = Number(document.getElementById("lunch").value) || 0;
-  let dinner = Number(document.getElementById("dinner").value) || 0;
-  let foodPrice = Number(document.getElementById("foodPrice").value);
+  // ===== LIFESTYLE CALCULATION =====
+  /*
+    Adds discretionary spending categories together
+  */
+  let lifestyleTotal =
+    Number(document.getElementById("shop").value) +
+    Number(document.getElementById("cinema").value) +
+    Number(document.getElementById("fitness").value) +
+    Number(document.getElementById("care").value);
 
-  let foodTotal = (breakfast + lunch + dinner) * foodPrice;
-
-  // ================= LIFESTYLE =================
-  let shop = Number(document.getElementById("shop").value);
-  let cinema = Number(document.getElementById("cinema").value);
-  let fitness = Number(document.getElementById("fitness").value);
-  let care = Number(document.getElementById("care").value);
-
-  let lifestyleTotal = shop + cinema + fitness + care;
-
-  // ================= TOTAL =================
+  // ===== FINAL TOTAL COST =====
   let total = rent + transportTotal + foodTotal + lifestyleTotal;
 
-  // ================= BENCHMARKS =================
-  const benchmarks = {
-    transport: 100,
-    food: 150,
-    lifestyle: 120
-  };
-
+  // ===== FEEDBACK GENERATION =====
   let feedback = "";
 
-  // ================= CHECKS =================
+  /*
+    Compare spending against benchmarks and generate advice
+  */
   if (transportTotal > benchmarks.transport) {
-    feedback += "🚗 Your transport costs are high. Consider using public transport more often.<br>";
+    feedback += "🚗 Transport spending is high. Consider public transport more often.<br>";
   }
 
   if (foodTotal > benchmarks.food) {
-    feedback += "🍔 You spend a lot on eating out. Try cooking more meals at home.<br>";
+    feedback += "🍔 Food spending is high. Cooking at home could save money.<br>";
   }
 
   if (lifestyleTotal > benchmarks.lifestyle) {
-    feedback += "🎬 Lifestyle spending is high. Reducing non-essential activities could help.<br>";
+    feedback += "🎬 Lifestyle spending is high. Reduce non-essential activities.<br>";
   }
 
+  /*
+    Overall warning if spending exceeds threshold
+  */
   if (total > 1000) {
-    feedback += "<strong>⚠️ Your total spending is quite high compared to average.</strong><br>";
+    feedback += "<strong>⚠️ Total weekly cost is high compared to average.</strong><br>";
   }
 
-  // ================= OUTPUT =================
+  /*
+    If no issues found, show positive message
+  */
+  if (!feedback) {
+    feedback = "✅ Your spending is within a reasonable range.";
+  }
+
+  // ===== DISPLAY OUTPUT =====
   document.getElementById("result").innerHTML = `
     <h2>Total Weekly Cost: $${total}</h2>
 
-    <p><strong>Rent Feedback:</strong><br>${rentFeedback}</p>
+    <p><strong>Rent Analysis:</strong><br>${rentFeedback}</p>
 
-    <p><strong>Suggestions:</strong><br>
-      ${feedback || "✅ Your spending is within a reasonable range."}
-    </p>
+    <p><strong>Suggestions:</strong><br>${feedback}</p>
   `;
 }
+
 </script>
 
 </body>
